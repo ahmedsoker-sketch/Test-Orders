@@ -179,7 +179,7 @@ function render() {
 
   let btnHtml = "";
   if (!s.running && !s.finished)
-    btnHtml = `<button class="btn btn-green" onclick="startTimer()" ${!s.orderId.trim()?'disabled':''}>▶ Start</button>`;
+    btnHtml = `<button class="btn btn-green" onclick="startTimer()">▶ Start</button>`;
   else if (s.running)
     btnHtml = `<button class="btn btn-red" onclick="stopTimer()">■ Stop</button>`;
 
@@ -270,8 +270,9 @@ function renderLog() {
 }
 
 function startTimer() {
-  state.orderId = document.getElementById("inp-order")?.value.trim() || state.orderId;
-  if (!state.orderId) return;
+  const inp = document.getElementById("inp-order");
+  if (inp) state.orderId = inp.value.trim();
+  if (!state.orderId) { alert("حط Order ID الأول"); return; }
   state.elapsed=0; state.finalMs=null; state.finished=false; state.saveStatus=null;
   state.reviewMins=""; state.reviewSecs="";
   state.startTime = Date.now(); state.running=true;
