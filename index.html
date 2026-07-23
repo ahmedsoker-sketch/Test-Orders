@@ -131,9 +131,13 @@ const saveQ = q => localStorage.setItem(QUEUE_KEY, JSON.stringify(q));
 async function sendWithRetry(payload, retries=3) {
   for (let i=0; i<retries; i++) {
     try {
-      const res = await fetch(APPS_SCRIPT_URL, { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload) });
-      const json = await res.json();
-      if (json.success || json.duplicate) return { ok:true, duplicate:!!json.duplicate };
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(payload)
+      });
+      return { ok:true };
     } catch {}
     await new Promise(r => setTimeout(r, 1200*(i+1)));
   }
