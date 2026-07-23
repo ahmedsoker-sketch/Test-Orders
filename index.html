@@ -3,68 +3,123 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Order Timer · Rider Ops</title>
+<title>Test Orders · Rider Ops</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { min-height: 100vh; background: #0f172a; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 32px 16px; }
-  .eyebrow { color: #f97316; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
-  .title { color: #f1f5f9; font-size: 22px; font-weight: 700; }
-  .subtitle { color: #94a3b8; font-size: 13px; margin-top: 6px; }
-  .card { background: #1e293b; border-radius: 20px; padding: 28px 22px; width: 100%; max-width: 400px; box-shadow: 0 8px 40px rgba(0,0,0,0.4); border: 1px solid #334155; }
-  label.lbl { color: #94a3b8; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 8px; }
-  input, select { width: 100%; background: #0f172a; border: 1.5px solid #334155; border-radius: 10px; color: #f1f5f9; font-size: 16px; font-weight: 600; padding: 12px 14px; outline: none; transition: border-color 0.2s; }
+  body { min-height: 100vh; background: #0f172a; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 28px 16px; }
+  .eyebrow { color: #f97316; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; text-align:center; }
+  .title { color: #f1f5f9; font-size: 20px; font-weight: 700; text-align:center; margin-bottom: 20px; }
+  .card { background: #1e293b; border-radius: 20px; padding: 24px 20px; width: 100%; max-width: 420px; box-shadow: 0 8px 40px rgba(0,0,0,0.4); border: 1px solid #334155; }
+  label.lbl { color: #94a3b8; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 7px; }
+  input, select { width: 100%; background: #0f172a; border: 1.5px solid #334155; border-radius: 10px; color: #f1f5f9; font-size: 15px; font-weight: 600; padding: 11px 13px; outline: none; transition: border-color 0.2s; margin-bottom: 16px; }
   input:focus, select:focus { border-color: #f97316; }
   select option { background: #1e293b; }
   input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-  .btn { border: none; border-radius: 12px; padding: 14px 0; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; transition: opacity 0.2s; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn { border: none; border-radius: 12px; padding: 13px 0; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; transition: opacity 0.2s; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
   .btn-green  { background: #22c55e; color: #fff; }
   .btn-red    { background: #dc2626; color: #fff; }
   .btn-orange { background: #f97316; color: #fff; }
   .btn-slate  { background: #334155; color: #cbd5e1; }
   .row { display: flex; gap: 10px; }
   .row > * { flex: 1; }
-  .ring-wrap { text-align: center; margin: 20px 0; }
-  .ring { display: inline-flex; align-items: center; justify-content: center; width: 170px; height: 170px; border-radius: 50%; border: 4px solid #334155; background: #0f172a; flex-direction: column; transition: border-color 0.3s, box-shadow 0.3s; }
-  .ring-time { color: #f1f5f9; font-size: 34px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+  .ring-wrap { text-align: center; margin: 16px 0; }
+  .ring { display: inline-flex; align-items: center; justify-content: center; width: 160px; height: 160px; border-radius: 50%; border: 4px solid #334155; background: #0f172a; flex-direction: column; transition: border-color 0.3s, box-shadow 0.3s; }
+  .ring-time { color: #f1f5f9; font-size: 32px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
   .ring-status { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; color: #475569; }
-  .result-box { background: #0f172a; border: 1.5px solid #f97316; border-radius: 12px; padding: 12px 0; text-align: center; }
-  .result-box .rlbl { color: #94a3b8; font-size: 10px; font-weight: 600; letter-spacing: 1px; }
-  .result-box .rval { color: #f97316; font-size: 20px; font-weight: 800; }
-  .divider { border-top: 1px solid #334155; margin: 20px 0; }
+  .result-box { background: #0f172a; border: 1.5px solid #f97316; border-radius: 12px; padding: 11px 0; text-align: center; }
+  .rlbl { color: #94a3b8; font-size: 10px; font-weight: 600; letter-spacing: 1px; }
+  .rval { color: #f97316; font-size: 18px; font-weight: 800; }
+  .divider { border-top: 1px solid #334155; margin: 18px 0; }
   .manual-total { background: #0f172a; border: 1.5px solid #334155; border-radius: 12px; padding: 10px 0; text-align: center; }
-  .manual-total .rlbl { color: #64748b; font-size: 10px; }
-  .manual-total .rval { color: #94a3b8; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
-  .colon { color: #475569; font-size: 28px; font-weight: 700; display: flex; align-items: center; padding-top: 18px; flex: 0 0 auto !important; }
+  .manual-total .rval { color: #94a3b8; font-size: 18px; }
+  .colon { color: #475569; font-size: 26px; font-weight: 700; display: flex; align-items: center; padding-top: 18px; flex: 0 0 auto !important; margin-bottom: 16px; }
   .status-msg { text-align: center; font-size: 12px; font-weight: 600; margin-top: 10px; }
-  .pending-banner { margin-top: 8px; background: #78350f; color: #fbbf24; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 5px 14px; display: inline-block; }
-  .log-wrap { width: 100%; max-width: 400px; margin-top: 24px; }
-  .log-label { color: #64748b; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
-  .log-item { background: #1e293b; border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; margin-bottom: 8px; }
+  .pending-banner { margin: 8px auto 0; background: #78350f; color: #fbbf24; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 5px 14px; display: inline-block; }
+  .log-wrap { width: 100%; max-width: 420px; margin-top: 22px; }
+  .log-label { color: #64748b; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .log-item { background: #1e293b; border-radius: 10px; padding: 11px 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; margin-bottom: 7px; }
   .log-item.pending { border-color: #78350f; }
-  .log-id { color: #f1f5f9; font-size: 14px; font-weight: 700; }
+  .log-id { color: #f1f5f9; font-size: 13px; font-weight: 700; }
+  .log-branch { color: #64748b; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
   .log-ts { color: #64748b; font-size: 11px; }
-  .log-durations { text-align: left; }
   .log-pickup { color: #f97316; font-size: 13px; font-weight: 700; }
   .log-review { color: #94a3b8; font-size: 13px; font-weight: 700; }
-  .change-btn { background: none; border: none; color: #475569; font-size: 12px; cursor: pointer; margin-right: 8px; }
-  .section-gap { margin-top: 20px; }
   .mini-lbl { color: #64748b; font-size: 10px; margin-bottom: 4px; text-align: center; }
-  input.center { text-align: center; font-size: 22px; font-weight: 800; padding: 10px 8px; }
+  input.center { text-align: center; font-size: 20px; font-weight: 800; padding: 10px 6px; margin-bottom: 0; }
+  .section-gap { margin-top: 16px; }
 </style>
 </head>
 <body>
 
-<div id="header" style="margin-bottom:20px;text-align:center"></div>
-<div id="app"></div>
+<div class="eyebrow" style="margin-bottom:4px">Rider Ops</div>
+<div class="title">Test Orders</div>
+<div id="pending-wrap" style="text-align:center;margin-bottom:12px"></div>
+
+<div class="card" id="app"></div>
 <div id="log-section"></div>
 
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwM0WcVfvz6z-6zlsb03697NGPvpHZcJfJDceu4n2WTyvOrZ4Oqit4XEzxQ3hr9O-Q7/exec";
-const ZONES = ["Mohandiseen","Hadayek el Qobba","Shobra","October","Giza","Other"];
-const QUEUE_KEY = "ot_queue";
 
-// ── Helpers ──
+const BRANCHES = [
+  "Tmart, Haram - Talbiya 2",
+  "Tmart, El Sheikh Zayed - El Hay 13",
+  "Tmart, 6th Of October - Palm Hills 360 Mall",
+  "Tmart, 6th of October - El Montzah",
+  "Tmart, 6th of October - 6th District",
+  "talabat mart, Downtown - El Sayeda Zeinab",
+  "talabat mart, Zahraa El Maadi - El Shatr El Sades",
+  "talabat mart, Zahraa El Maadi - El Me`arag El Ouloy",
+  "talabat mart, Shobra - El Sahel",
+  "talabat mart, New Maadi - Taqseem Laselky",
+  "talabat mart, Nasr City - El Hadeeqa El Dawlia",
+  "talabat mart, Mokattam - El Nafora Square",
+  "talabat mart, Mokattam - El Mafarik",
+  "talabat mart, Mokattam - Easy Sport Club",
+  "talabat mart, Mohandesin - Lebanon square",
+  "talabat mart, Maadi Old",
+  "talabat mart, Helwan",
+  "talabat mart, Heliopolis - Hegaz Square",
+  "talabat mart, Hadayek El Ahram - Area ح",
+  "talabat mart, Faisal - Maryoteya",
+  "talabat mart, El Zaitoun - Al Gharbeya",
+  "talabat mart, El Sheikh Zayed - El Hay 9",
+  "talabat mart, El Daher",
+  "talabat mart, Dokki - Mosaddak",
+  "talabat mart, Ard El Golf",
+  "talabat mart, Al-Manial",
+  "talabat mart, Agouza",
+  "talabat mart, 6th of October - Wahet El Mohandsen",
+  "talabat mart, 6th Of October - Palm Hills",
+  "talabat mart, 6th of October - 4th District",
+  "talabat mart, Haram - Tersa",
+  "Tmart, Tagammoa 5 - Hay 1",
+  "Tmart, Tagammoa 5 - Emaar Mivida",
+  "tmart, Nasr City - Omarat El Tawfiq",
+  "Tmart, Masaken Sheraton - Abdel Hamid Badwai",
+  "Tmart, Madinaty - Work Shops",
+  "Tmart, ElNakheel compound",
+  "Tmart, El Shorouk - 3rd District",
+  "Tmart, El Obour Industrial Area BG",
+  "Tmart, Creek town Compound",
+  "talabat mart, Madinaty - Sporting Club",
+  "talabat mart, Tagmoaa 5 - AUC",
+  "talabat mart, Tagammoa 5 - South Investors",
+  "talabat mart, Tagammoa 5 - El Lotus El Shamaleya",
+  "talabat mart, Tagammoa 5 - El Banafseg Buildings",
+  "talabat mart, Tagammoa 1",
+  "talabat mart, Nasr City - Masaken El Shorouk",
+  "Talabat Mart, Nasr City - Hay 8",
+  "talabat mart, Nasr City - El Tayaran",
+  "talabat mart, Matareya",
+  "talabat mart, El Shorouk - 1st Area",
+  "talabat mart, El Rehab City",
+  "talabat mart, El Obour - El Hay 9",
+  "talabat mart, Tagammoa 5 - Banks Center"
+];
+
+const QUEUE_KEY = "ot_queue";
 const fmtMs = ms => {
   const s = Math.floor(ms/1000), m = Math.floor(s/60);
   return `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}.${String(Math.floor((ms%1000)/10)).padStart(2,'0')}`;
@@ -85,11 +140,8 @@ async function sendWithRetry(payload, retries=3) {
   return { ok:false };
 }
 
-// ── State ──
 let state = {
-  screen: localStorage.getItem("ot_agent") ? "main" : "setup",
-  agent:  localStorage.getItem("ot_agent") || "",
-  zone:   localStorage.getItem("ot_zone")  || ZONES[0],
+  branch: localStorage.getItem("ot_branch") || BRANCHES[0],
   orderId: "", elapsed: 0, running: false, finished: false,
   startTime: null, finalMs: null,
   reviewMins: "", reviewSecs: "",
@@ -99,7 +151,6 @@ let state = {
 };
 let ticker = null;
 
-// ── Flush queue ──
 async function flushQueue() {
   const q = loadQ(); if (!q.length) return;
   const remaining = [];
@@ -109,61 +160,22 @@ async function flushQueue() {
   }
   saveQ(remaining);
   state.pendingCount = remaining.length;
-  render();
+  renderPending();
 }
 window.addEventListener("online", flushQueue);
 flushQueue();
 
-// ── Render ──
+function renderPending() {
+  document.getElementById("pending-wrap").innerHTML = state.pendingCount > 0
+    ? `<div class="pending-banner">⏳ ${state.pendingCount} أوردر لسه مش اتبعت — هيتبعت أول ما يرجع النت</div>`
+    : "";
+}
+
 function render() {
-  if (state.screen === "setup") renderSetup();
-  else renderMain();
-}
-
-function renderSetup() {
-  document.getElementById("header").innerHTML = "";
-  document.getElementById("log-section").innerHTML = "";
-  document.getElementById("app").innerHTML = `
-    <div class="card" style="max-width:400px;width:100%">
-      <div style="text-align:center;margin-bottom:24px">
-        <div class="eyebrow">Rider Ops</div>
-        <div class="title">من أنت؟</div>
-        <div class="subtitle">بتتسجل مرة واحدة على الجهاز</div>
-      </div>
-      <label class="lbl">اسمك</label>
-      <input id="inp-agent" placeholder="Mohamed Salah" value="${state.agent}" style="margin-bottom:16px"/>
-      <label class="lbl">الزون</label>
-      <select id="inp-zone" style="margin-bottom:24px">
-        ${ZONES.map(z=>`<option ${z===state.zone?'selected':''}>${z}</option>`).join('')}
-      </select>
-      <button class="btn btn-orange" onclick="saveAgent()">ابدأ ←</button>
-    </div>`;
-}
-
-function saveAgent() {
-  const a = document.getElementById("inp-agent").value.trim();
-  const z = document.getElementById("inp-zone").value;
-  if (!a) return;
-  state.agent = a; state.zone = z;
-  localStorage.setItem("ot_agent", a);
-  localStorage.setItem("ot_zone", z);
-  state.screen = "main";
-  render();
-}
-
-function renderMain() {
+  renderPending();
   const s = state;
   const ringColor = s.running ? "#22c55e" : s.finished ? "#f97316" : "#334155";
-  const ringGlow  = s.running ? `box-shadow:0 0 28px ${ringColor}55` : "";
-
-  document.getElementById("header").innerHTML = `
-    <div class="eyebrow">Rider Ops · Order Timer</div>
-    <div class="subtitle">
-      <button class="change-btn" onclick="changeAgent()">تغيير</button>
-      ${s.agent} — <span style="color:#f97316">${s.zone}</span>
-    </div>
-    ${s.pendingCount > 0 ? `<div class="pending-banner">⏳ ${s.pendingCount} أوردر لسه مش اتبعت — هيتبعت أول ما يرجع النت</div>` : ''}
-  `;
+  const ringGlow  = s.running ? `box-shadow:0 0 26px ${ringColor}55` : "";
 
   let btnHtml = "";
   if (!s.running && !s.finished)
@@ -171,32 +183,28 @@ function renderMain() {
   else if (s.running)
     btnHtml = `<button class="btn btn-red" onclick="stopTimer()">■ Stop</button>`;
 
-  let resultHtml = "";
-  if (s.finished) resultHtml = `
+  let resultHtml = s.finished ? `
     <div class="result-box">
       <div class="rlbl">مدة الاستلام</div>
       <div class="rval">${fmtMs(s.finalMs)}</div>
-    </div>`;
+    </div>` : "";
 
-  let reviewHtml = "";
-  if (s.finished) reviewHtml = `
+  let reviewHtml = s.finished ? `
     <div class="divider"></div>
     <label class="lbl">وقت مراجعة الأوردر <span style="color:#475569;font-weight:400;text-transform:none;letter-spacing:0">(يدوي)</span></label>
     <div class="row" style="align-items:flex-end">
       <div>
         <div class="mini-lbl">دقايق</div>
-        <input class="center" type="number" min="0" max="59" placeholder="00" id="inp-rmins" value="${s.reviewMins}" oninput="updateReview()" />
+        <input class="center" type="number" min="0" max="59" placeholder="00" id="inp-rmins" value="${s.reviewMins}" oninput="updateReview()"/>
       </div>
       <div class="colon">:</div>
       <div>
         <div class="mini-lbl">ثواني</div>
-        <input class="center" type="number" min="0" max="59" placeholder="00" id="inp-rsecs" value="${s.reviewSecs}" oninput="updateReview()" />
+        <input class="center" type="number" min="0" max="59" placeholder="00" id="inp-rsecs" value="${s.reviewSecs}" oninput="updateReview()"/>
       </div>
       <div>
         <div class="mini-lbl">المجموع</div>
-        <div class="manual-total">
-          <div class="rval">${fmtManual(s.reviewMins, s.reviewSecs)}</div>
-        </div>
+        <div class="manual-total"><div class="rval">${fmtManual(s.reviewMins, s.reviewSecs)}</div></div>
       </div>
     </div>
     <div class="row section-gap">
@@ -207,32 +215,36 @@ function renderMain() {
     ${s.saveStatus==='duplicate' ? '<div class="status-msg" style="color:#f59e0b">⚠ الأوردر ده اتسجل قبل كده النهارده</div>' : ''}
     ${s.saveStatus==='queued'    ? '<div class="status-msg" style="color:#f59e0b">📵 النت واقع — اتحفظ محلياً وهيتبعت أوتوماتيك</div>' : ''}
     ${s.saveStatus==='err'       ? '<div class="status-msg" style="color:#ef4444">✗ فشل الحفظ</div>' : ''}
-  `;
+  ` : "";
 
   document.getElementById("app").innerHTML = `
-    <div class="card" style="max-width:400px;width:100%">
-      <label class="lbl">Order ID</label>
-      <input id="inp-order" placeholder="123456789" value="${s.orderId}"
-        style="border-color:${s.orderId&&!s.running?'#f97316':'#334155'};opacity:${s.running||s.finished?0.6:1};margin-bottom:20px"
-        ${s.running||s.finished?'disabled':''} oninput="state.orderId=this.value" />
+    <label class="lbl">الفرع</label>
+    <select id="inp-branch" onchange="state.branch=this.value;localStorage.setItem('ot_branch',this.value)" ${s.running||s.finished?'disabled style="opacity:0.5"':''}>
+      ${BRANCHES.map(b=>`<option ${b===s.branch?'selected':''}>${b}</option>`).join('')}
+    </select>
 
-      <label class="lbl">مدة الاستلام</label>
-      <div class="ring-wrap">
-        <div class="ring" style="border-color:${ringColor};${ringGlow}">
-          <div class="ring-time">${fmtMs(s.elapsed)}</div>
-          <div class="ring-status" style="color:${s.running?'#22c55e':s.finished?'#f97316':'#475569'}">
-            ${s.running?'Running':s.finished?'Stopped':'Ready'}
-          </div>
+    <label class="lbl">Order ID</label>
+    <input id="inp-order" placeholder="123456789" value="${s.orderId}"
+      style="border-color:${s.orderId&&!s.running?'#f97316':'#334155'};${s.running||s.finished?'opacity:0.5':''}"
+      ${s.running||s.finished?'disabled':''} oninput="state.orderId=this.value"/>
+
+    <label class="lbl">مدة الاستلام</label>
+    <div class="ring-wrap">
+      <div class="ring" style="border-color:${ringColor};${ringGlow}">
+        <div class="ring-time" id="ring-time">${fmtMs(s.elapsed)}</div>
+        <div class="ring-status" style="color:${s.running?'#22c55e':s.finished?'#f97316':'#475569'}">
+          ${s.running?'Running':s.finished?'Stopped':'Ready'}
         </div>
       </div>
+    </div>
 
-      <div class="row">
-        <div>${btnHtml}</div>
-        ${s.finished ? `<div>${resultHtml}</div>` : ''}
-      </div>
+    <div class="row">
+      <div>${btnHtml}</div>
+      ${s.finished?`<div>${resultHtml}</div>`:''}
+    </div>
 
-      ${reviewHtml}
-    </div>`;
+    ${reviewHtml}
+  `;
 
   renderLog();
 }
@@ -244,11 +256,12 @@ function renderLog() {
       <div class="log-label">Session Log</div>
       ${state.log.map(e=>`
         <div class="log-item ${e.pending?'pending':''}">
-          <div>
+          <div style="overflow:hidden">
             <div class="log-id">#${e.orderId}</div>
+            <div class="log-branch">${e.branch}</div>
             <div class="log-ts">${e.ts}${e.pending?' · ⏳ pending':''}</div>
           </div>
-          <div class="log-durations">
+          <div style="text-align:left;flex-shrink:0;margin-right:8px">
             <div class="log-pickup">📦 ${e.pickup}</div>
             <div class="log-review">🔍 ${e.review}</div>
           </div>
@@ -256,16 +269,13 @@ function renderLog() {
     </div>`;
 }
 
-// ── Actions ──
-function changeAgent() { state.screen="setup"; render(); }
-
 function startTimer() {
   state.orderId = document.getElementById("inp-order")?.value.trim() || state.orderId;
   if (!state.orderId) return;
   state.elapsed=0; state.finalMs=null; state.finished=false; state.saveStatus=null;
   state.reviewMins=""; state.reviewSecs="";
   state.startTime = Date.now(); state.running=true;
-  ticker = setInterval(()=>{ state.elapsed=Date.now()-state.startTime; updateRing(); }, 50);
+  ticker = setInterval(()=>{ state.elapsed=Date.now()-state.startTime; const el=document.getElementById("ring-time"); if(el) el.textContent=fmtMs(state.elapsed); }, 50);
   render();
 }
 
@@ -274,11 +284,6 @@ function stopTimer() {
   state.finalMs = state.elapsed;
   state.running=false; state.finished=true;
   render();
-}
-
-function updateRing() {
-  const el = document.querySelector(".ring-time");
-  if (el) el.textContent = fmtMs(state.elapsed);
 }
 
 function updateReview() {
@@ -292,27 +297,25 @@ async function submitEntry() {
   state.saving=true; state.saveStatus=null; render();
   const payload = {
     orderId: state.orderId,
-    agent: state.agent,
-    zone: state.zone,
+    agent: state.branch,
+    zone: state.branch,
     pickupMs: state.finalMs,
     reviewMins: parseInt(state.reviewMins)||0,
     reviewSecs: parseInt(state.reviewSecs)||0,
   };
   const result = await sendWithRetry(payload);
   const entry = {
-    orderId: payload.orderId,
+    orderId: payload.orderId, branch: state.branch,
     pickup: fmtMs(state.finalMs),
     review: fmtManual(payload.reviewMins, payload.reviewSecs),
     ts: new Date().toLocaleTimeString("ar-EG"),
     pending: !result.ok
   };
-  if (result.duplicate) { state.saveStatus="duplicate"; }
-  else if (result.ok)   { state.saveStatus="ok"; state.log.unshift(entry); }
+  if (result.duplicate)     { state.saveStatus="duplicate"; }
+  else if (result.ok)       { state.saveStatus="ok"; state.log.unshift(entry); }
   else {
-    const q = loadQ(); q.push({...payload, _queuedAt:Date.now()}); saveQ(q);
-    state.pendingCount = q.length;
-    state.saveStatus="queued";
-    state.log.unshift(entry);
+    const q=loadQ(); q.push({...payload,_queuedAt:Date.now()}); saveQ(q);
+    state.pendingCount=q.length; state.saveStatus="queued"; state.log.unshift(entry);
   }
   state.saving=false; render();
 }
@@ -324,7 +327,6 @@ function resetTimer() {
   render();
 }
 
-// ── Init ──
 render();
 </script>
 </body>
