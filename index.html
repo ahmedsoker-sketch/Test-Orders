@@ -43,13 +43,17 @@
   .log-pickup { color: #f97316; font-size: 13px; font-weight: 700; }
   .log-review { color: #3b82f6; font-size: 13px; font-weight: 700; }
   .section-gap { margin-top: 14px; }
+  .counter-badge { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 8px 18px; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .counter-num { color: #f97316; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .counter-lbl { color: #64748b; font-size: 12px; font-weight: 600; }
 </style>
 </head>
 <body>
 
 <div class="eyebrow">Rider Ops</div>
 <div class="title">Test Orders</div>
-<div id="pending-wrap" style="text-align:center;margin-bottom:12px"></div>
+<div id="pending-wrap" style="text-align:center;margin-bottom:6px"></div>
+<div id="counter-wrap" style="text-align:center;margin-bottom:12px"></div>
 <div class="card" id="app"></div>
 <div id="log-section"></div>
 
@@ -112,6 +116,7 @@ async function sendWithRetry(payload, retries=3) {
 let state = {
   branch: localStorage.getItem("ot_branch") || BRANCHES[0],
   orderId: "",
+  sessionCount: 0,
   // Pickup stopwatch
   pickupElapsed: 0, pickupRunning: false, pickupDone: false,
   pickupStart: null, pickupMs: null,
@@ -137,6 +142,11 @@ flushQueue();
 function renderPending() {
   document.getElementById("pending-wrap").innerHTML = state.pendingCount > 0
     ? `<div class="pending-banner">⏳ ${state.pendingCount} أوردر لسه مش اتبعت</div>` : "";
+  document.getElementById("counter-wrap").innerHTML = `
+    <div class="counter-badge">
+      <div class="counter-num">${state.sessionCount}</div>
+      <div class="counter-lbl">تسجيل في هذه الجلسة</div>
+    </div>`;
 }
 
 function render() {
@@ -197,9 +207,9 @@ function render() {
     </select>
 
     <label class="lbl">Order ID</label>
-    <input id="inp-order" placeholder="123456789" value="${s.orderId}"
+    <input id="inp-order" type="number" inputmode="numeric" placeholder="123456789" value="${s.orderId}"
       style="border-color:${s.orderId&&!s.pickupRunning?'#f97316':'#334155'};${s.pickupRunning||s.pickupDone?'opacity:0.5':''}"
-      ${s.pickupRunning||s.pickupDone?'disabled':''} oninput="state.orderId=this.value"/>
+      ${s.pickupRunning||s.pickupDone?'disabled':''} oninput="state.orderId=this.value.replace(/[^0-9]/g,'')"/>
 
     <div class="divider" style="margin:4px 0 14px"></div>
 
@@ -310,7 +320,7 @@ async function submitEntry() {
     ts: new Date().toLocaleTimeString("ar-EG"),
     pending: !result.ok
   };
-  if (result.ok) { state.saveStatus="ok"; }
+  if (result.ok) { state.saveStatus="ok"; state.sessionCount++; }
   else {
     const q=loadQ(); q.push({...payload,_queuedAt:Date.now()}); saveQ(q);
     state.pendingCount=q.length; state.saveStatus="queued";
