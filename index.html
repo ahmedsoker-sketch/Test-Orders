@@ -195,7 +195,7 @@ function render() {
           <button class="btn btn-orange" onclick="submitEntry()" ${s.saving||!hasOrder?'disabled':''} style="${!hasOrder?'opacity:0.35':''}">
             ${s.saving?'⏳ جاري الحفظ...':'✓ حفظ في الشيت'}
           </button>
-          <button class="btn btn-slate" onclick="resetAll()">↺ جديد</button>
+          <button class="btn btn-slate" onclick="resetAll()">↺ تسجيل جديد</button>
         </div>
         ${!hasOrder ? '<div class="status-msg" style="color:#f59e0b">⚠ حط Order ID عشان تحفظ</div>' : ''}
         ${s.saveStatus==='ok'     ? '<div class="status-msg" style="color:#22c55e">✓ اتحفظ في الشيت</div>' : ''}
