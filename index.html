@@ -50,8 +50,8 @@
 </head>
 <body>
 
-<div class="eyebrow">Talabat Ops</div>
-<div class="title">T-Mart Test Orders</div>
+<div class="eyebrow">Rider Ops</div>
+<div class="title">Test Orders</div>
 <div id="pending-wrap" style="text-align:center;margin-bottom:6px"></div>
 <div id="counter-wrap" style="text-align:center;margin-bottom:12px"></div>
 <div class="card" id="app"></div>
@@ -168,6 +168,7 @@ function render() {
   let pickupBtn = "";
   if (!s.pickupRunning && !s.pickupDone)
     pickupBtn = `<button class="btn btn-green" onclick="startPickup()">▶ Start</button>`;
+
   else if (s.pickupRunning)
     pickupBtn = `<button class="btn btn-red" onclick="stopPickup()">■ Stop</button>`;
   else if (s.pickupDone)
@@ -184,19 +185,25 @@ function render() {
       reviewBtn = `<div class="result-box" style="border-color:#a78bfa"><div class="rlbl">وقت المراجعة</div><div class="rval" style="color:#a78bfa">${fmtMs(s.reviewMs)}</div></div>`;
   }
 
-  // Save/Reset
+  // Save/Reset — submit يظهر بعد pickup، المراجعة اختيارية
   let saveRow = "";
-  if (s.pickupDone && s.reviewDone) {
+  if (s.pickupDone && !s.reviewRunning) {
+    const hasOrder = s.orderId.trim().length > 0;
     saveRow = `
-      <div class="row section-gap">
-        <button class="btn btn-orange" onclick="submitEntry()" ${s.saving?'disabled':''}>${s.saving?'⏳ جاري الحفظ...':'✓ حفظ في الشيت'}</button>
-        <button class="btn btn-slate" onclick="resetAll()">↺ جديد</button>
+      <div id="save-row">
+        <div class="row section-gap">
+          <button class="btn btn-orange" onclick="submitEntry()" ${s.saving||!hasOrder?'disabled':''} style="${!hasOrder?'opacity:0.35':''}">
+            ${s.saving?'⏳ جاري الحفظ...':'✓ حفظ في الشيت'}
+          </button>
+          <button class="btn btn-slate" onclick="resetAll()">↺ جديد</button>
+        </div>
+        ${!hasOrder ? '<div class="status-msg" style="color:#f59e0b">⚠ حط Order ID عشان تحفظ</div>' : ''}
+        ${s.saveStatus==='ok'     ? '<div class="status-msg" style="color:#22c55e">✓ اتحفظ في الشيت</div>' : ''}
+        ${s.saveStatus==='queued' ? '<div class="status-msg" style="color:#f59e0b">📵 اتحفظ محلياً — هيتبعت أول ما يرجع النت</div>' : ''}
+        ${s.saveStatus==='err'    ? '<div class="status-msg" style="color:#ef4444">✗ فشل الحفظ</div>' : ''}
       </div>
-      ${s.saveStatus==='ok'     ? '<div class="status-msg" style="color:#22c55e">✓ اتحفظ في الشيت</div>' : ''}
-      ${s.saveStatus==='queued' ? '<div class="status-msg" style="color:#f59e0b">📵 اتحفظ محلياً — هيتبعت أول ما يرجع النت</div>' : ''}
-      ${s.saveStatus==='err'    ? '<div class="status-msg" style="color:#ef4444">✗ فشل الحفظ</div>' : ''}
     `;
-  } else if (s.pickupDone || s.reviewDone) {
+  } else if (s.reviewRunning) {
     saveRow = `<div class="section-gap"><button class="btn btn-slate" onclick="resetAll()">↺ إلغاء وبدأ من الأول</button></div>`;
   }
 
@@ -208,12 +215,13 @@ function render() {
 
     <label class="lbl">Order ID</label>
     <input id="inp-order" type="number" inputmode="numeric" placeholder="123456789" value="${s.orderId}"
-      style="border-color:${s.orderId&&!s.pickupRunning?'#f97316':'#334155'};${s.pickupRunning||s.pickupDone?'opacity:0.5':''}"
-      ${s.pickupRunning||s.pickupDone?'disabled':''} oninput="state.orderId=this.value.replace(/[^0-9]/g,'')"/>
+      style="border-color:${s.orderId?'#f97316':'#334155'}"
+      oninput="state.orderId=this.value.replace(/[^0-9]/g,'');renderSaveRow()"/>
 
     <div class="divider" style="margin:4px 0 14px"></div>
 
-    <label class="lbl" style="color:#94a3b8">📦 مدة الاستلام</label>
+    <label class="lbl" style="color:#94a3b8">📦 وقت الاستلام</label>
+    <div style="color:#475569;font-size:11px;margin-bottom:10px;line-height:1.5">يبدأ بمجرد وصول الطيار مكان التسليم وينتهي بمجرد استلامه الأوردر</div>
     <div class="ring-wrap">
       <div class="ring" style="border-color:${pc};${pg}">
         <div class="ring-time" id="pickup-time">${fmtMs(s.pickupElapsed)}</div>
@@ -224,7 +232,8 @@ function render() {
 
     ${s.pickupDone ? `
     <div class="divider"></div>
-    <label class="lbl" style="color:#94a3b8">🔍 وقت المراجعة</label>
+    <label class="lbl" style="color:#94a3b8">🔍 وقت مراجعة الأوردر</label>
+    <div style="color:#475569;font-size:11px;margin-bottom:10px;line-height:1.5">الوقت اللي هياخده الطيار وهو بيراجع الأوردر</div>
     <div class="ring-wrap">
       <div class="ring" style="border-color:${rc};${rg}">
         <div class="ring-time" id="review-time">${fmtMs(s.reviewElapsed)}</div>
@@ -264,7 +273,6 @@ function renderLog() {
 function startPickup() {
   const inp = document.getElementById("inp-order");
   if (inp) state.orderId = inp.value.trim();
-  if (!state.orderId) { alert("حط Order ID الأول"); return; }
   state.pickupElapsed=0; state.pickupMs=null; state.pickupDone=false;
   state.reviewElapsed=0; state.reviewMs=null; state.reviewDone=false;
   state.saveStatus=null;
@@ -273,6 +281,9 @@ function startPickup() {
     state.pickupElapsed = Date.now()-state.pickupStart;
     const el = document.getElementById("pickup-time");
     if (el) el.textContent = fmtMs(state.pickupElapsed);
+    // sync order ID from input without re-render
+    const inp = document.getElementById("inp-order");
+    if (inp) state.orderId = inp.value.trim();
   }, 50);
   render();
 }
@@ -330,6 +341,23 @@ async function submitEntry() {
 }
 
 // ── Reset ──
+function renderSaveRow() {
+  const el = document.getElementById("save-row");
+  if (!el || !state.pickupDone) return;
+  const hasOrder = state.orderId.trim().length > 0;
+  el.innerHTML = `
+    <div class="row section-gap">
+      <button class="btn btn-orange" onclick="submitEntry()" ${state.saving||!hasOrder?'disabled':''} style="${!hasOrder?'opacity:0.35':''}">
+        ${state.saving?'⏳ جاري الحفظ...':'✓ حفظ في الشيت'}
+      </button>
+      <button class="btn btn-slate" onclick="resetAll()">↺ جديد</button>
+    </div>
+    ${!hasOrder ? '<div class="status-msg" style="color:#f59e0b">⚠ حط Order ID عشان تحفظ</div>' : ''}
+    ${state.saveStatus==='ok'     ? '<div class="status-msg" style="color:#22c55e">✓ اتحفظ في الشيت</div>' : ''}
+    ${state.saveStatus==='queued' ? '<div class="status-msg" style="color:#f59e0b">📵 اتحفظ محلياً — هيتبعت أول ما يرجع النت</div>' : ''}
+  `;
+}
+
 function resetAll() {
   clearInterval(pickupTicker); clearInterval(reviewTicker);
   state.orderId="";
